@@ -1,6 +1,7 @@
 # adiabatic approximation of thermodynamic properties inside the engine
 import CoolProp.CoolProp as CP
-import Numpy as np
+import numpy as np
+import pandas as pd
 
 # inputs
 p_ch = 100000       # chamber pressure in Pa
@@ -20,3 +21,5 @@ print(components_string)
 
 p_steps = list(range(p_ch, p_e+1, (p_ch - p_e)//n_ps))
 
+data = np.zeros((n_ps, 7))
+print(data)
