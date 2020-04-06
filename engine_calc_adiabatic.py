@@ -14,12 +14,44 @@ x_co = 0.23055
 x_h2 = 0.21104
 x_h2o = 0.17950
 x_co2 = 0.03140
-x_h = 0.00482
 
-components_string = "n2[{}]&co[{}]&h2[{}]&h2o[{}]&co2[{}]&h[{}]".format(x_n2, x_co, x_h2, x_h2o, x_co2, x_h)
-print(components_string)
+components_string = "HEOS::N2[{}]&CO[{}]&H2[{}]&H2O[{}]&CO2[{}]".format(x_n2, x_co, x_h2, x_h2o, x_co2)
+thermoprops = ['P', 'T', 'rho', 'kappa', 'h', 'u', 'M', 'd']
+M_mix = CP.PropsSI('M', components_string)
+mixture = pd.DataFrame(np.zeros((5, 2)), index=['N2', 'CO', 'H2', 'H2O', 'CO2'], columns=['molar', 'mass'])
 
-p_steps = list(range(p_ch, p_e+1, (p_ch - p_e)//n_ps))
+mixture.loc['N2']['molar'] = x_n2
+mixture.loc['CO']['molar'] = x_co
+mixture.loc['H2']['molar'] = x_h2
+mixture.loc['H2O']['molar'] = x_h2o
+mixture.loc['CO2']['molar'] = x_co2
 
-data = np.zeros((n_ps, 7))
+
+def masscalc(row):
+    return row['molar'] * CP.PropsSI('M', row.name) / M_mix
+
+
+mixture['mass'] = mixture.apply(masscalc, axis=1)
+
+print(mixture)
+
+
+def mixer(prop, ip1, input1, ip2, input2, mixture=mixture, mode='molar'):
+    value = 0
+    for index, row in mixture.iterrows():
+        value += row[mode]*CP.PropsSI(prop, ip1, input1, ip2, input2, row.name)
+    return value
+
+
+p_step = (p_ch-p_e)/(n_ps-1)
+data = pd.DataFrame(np.zeros((n_ps, thermoprops.__len__())), columns=thermoprops)
+
+data['T'][0] = T_ch
+
+for index, row in data.iterrows():
+    row['P'] = p_ch-row.name*p_step
+    if index != 0:
+        row['T'] = data.loc['T'][str(int(index-1))] * (row['P'] / data.loc['P'][str(int(index-1))])**((data.loc['kappa'][str(int(index-1))]+1) / data.loc['kappa'][str(int(index-1))])
+    row['kappa'] = mixer('CP0MOLAR', 'T', row['T'], 'P', row['P']) / mixer('CVMOLAR', 'T', row['T'], 'P', row['T'])
+
 print(data)
