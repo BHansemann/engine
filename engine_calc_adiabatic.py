@@ -16,15 +16,16 @@ x_h2o = 0.17950
 x_co2 = 0.03140
 
 components_string = "HEOS::N2[{}]&CO[{}]&H2[{}]&H2O[{}]&CO2[{}]".format(x_n2, x_co, x_h2, x_h2o, x_co2)
-thermoprops = ['P', 'T', 'rho', 'kappa', 'h', 'u', 'M', 'd']
+thermoprops = ['P', 'T', 'rho', 'kappa', 'h', 'u', 'c', 'M', 'd']
 M_mix = CP.PropsSI('M', components_string)
+R_mix = CP.PropsSI('GAS_CONSTANT', components_string)
 mixture = pd.DataFrame(np.zeros((5, 2)), index=['N2', 'CO', 'H2', 'H2O', 'CO2'], columns=['molar', 'mass'])
 
-mixture.loc['N2']['molar'] = x_n2
-mixture.loc['CO']['molar'] = x_co
-mixture.loc['H2']['molar'] = x_h2
-mixture.loc['H2O']['molar'] = x_h2o
-mixture.loc['CO2']['molar'] = x_co2
+mixture.loc['N2', 'molar'] = x_n2
+mixture.loc['CO', 'molar'] = x_co
+mixture.loc['H2', 'molar'] = x_h2
+mixture.loc['H2O', 'molar'] = x_h2o
+mixture.loc['CO2', 'molar'] = x_co2
 
 
 def masscalc(row):
@@ -51,7 +52,13 @@ data['T'][0] = T_ch
 for index, row in data.iterrows():
     row['P'] = p_ch-row.name*p_step
     if index != 0:
-        row['T'] = data.loc['T'][str(int(index-1))] * (row['P'] / data.loc['P'][str(int(index-1))])**((data.loc['kappa'][str(int(index-1))]+1) / data.loc['kappa'][str(int(index-1))])
+        row['T'] = data.loc[index-1, 'T'] * (row['P'] / data.loc[index-1, 'P'])**((data.loc[index-1, 'kappa'] - 1) / data.loc[index-1, 'kappa'])
     row['kappa'] = mixer('CP0MOLAR', 'T', row['T'], 'P', row['P']) / mixer('CVMOLAR', 'T', row['T'], 'P', row['T'])
+    row['h'] = mixer('H', 'P', row['P'], 'T', row['T'], mode='mass')
+    if index != 0:
+        row['u'] = (2 * (mixer('H', 'P', data.loc[index-1, 'P'], 'T', data.loc[index-1, 'T'], mode='mass') - row['h'] + (data.loc[index-1, 'u']**2)/2))**0.5
+    row['rho'] = row['P'] / (R_mix * row['T'])
+    row['c'] = (row['kappa'] * R_mix * row['T'])**0.5
+    row['M'] = row['u'] / row['c']
 
-print(data)
+print(data.to_string())
