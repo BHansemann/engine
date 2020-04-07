@@ -7,7 +7,9 @@ import matplotlib.pyplot as plt
 import math
 
 
-def conical_nozzle(r_t, r_ch, eta, alpha_div=15, alpha_con=20, rf_t=1, n_steps=100):
+def conical_nozzle(r_t, r_ch, eta, alpha_div=15, alpha_con=35, rf_t=1, n_steps=1000):
+    alpha_div = math.radians(alpha_div)
+    alpha_con = math.radians(alpha_con)
     r_e = (eta * r_t**2)**0.5
     nozzle = pd.DataFrame(np.zeros((n_steps, 3)), columns={'x', 'y', 'section'})
     nozzle.loc[0, 'y'] = r_ch
@@ -19,24 +21,29 @@ def conical_nozzle(r_t, r_ch, eta, alpha_div=15, alpha_con=20, rf_t=1, n_steps=1
     for index, row in nozzle.iterrows():
         row['x'] = row.name * (l_sum / n_steps)
         row['section'] = 3
-        if row['x'] < l_1 + l_2 + l_3:
-            row['section'] = 2
-        if row['x'] < l_1 + l_2:
-            row['section'] = 1
-        if row['x'] < l_1:
+        row['x']
+        if row['x'] <= l_1:
             row['section'] = 0
-
-    for index, row in nozzle.iterrows():
-        if row['section'] == 0:
             row['y'] = r_ch - row['x'] * math.sin(alpha_con)
+        if l_1 < row['x'] <= l_1 + l_2:
+            row['section'] = 1
+            row['y'] = r_t * (1 + (1 - math.cos(math.asin((l_2 - row['x'] + l_1) / (r_t * rf_t)))))
+        if l_1 + l_2 < row['x'] <= l_1 + l_2 + l_3:
+            row['section'] = 2
+            row['y'] = r_t * (1 + (1 - math.cos(math.asin((row['x'] - l_1 - l_2) / (r_t * rf_t)))))
+        if l_1 + l_2 + l_3 < row['x']:
+            row['section'] = 3
+            row['y'] = r_t * (1 + rf_t * (1 - math.cos(alpha_div))) + (row['x'] - (l_1 + l_2 + l_3)) * math.sin(alpha_div)
 
     return nozzle
 
 
 if __name__ == '__main__':
     print('This Module is not supposed to be used on it\'s own')
-    example = conical_nozzle(0.01, 0.02, 5)
+    example = conical_nozzle(0.01, 0.02, 2.5)
     print(example)
-    plt.plot(example['x'], example['y'])
-    plt.plot(example['x'], example['section'])
+    fig, ax = plt.subplots()
+    ax.plot(example['x'], example['y'])
+    ax.set(ylim=(0, 0.03))
+    ax.set_aspect('equal')
     plt.show()
