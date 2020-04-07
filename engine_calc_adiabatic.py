@@ -18,7 +18,7 @@ x_h2o = 0.17950
 x_co2 = 0.03140
 
 components_string = "HEOS::N2[{}]&CO[{}]&H2[{}]&H2O[{}]&CO2[{}]".format(x_n2, x_co, x_h2, x_h2o, x_co2)
-thermoprops = ['P', 'T', 'rho', 'kappa', 'h', 'u', 'c', 'M', 'd']
+thermoprops = ['P', 'T', 'rho', 'kappa', 'h', 'u', 'c', 'M', 'r']
 M_mix = CP.PropsSI('M', components_string)
 R_mix = CP.PropsSI('GAS_CONSTANT', components_string)
 mixture = pd.DataFrame(np.zeros((5, 2)), index=['N2', 'CO', 'H2', 'H2O', 'CO2'], columns=['molar', 'mass'])
@@ -67,6 +67,6 @@ m_dot = F_thrust / (data['u'].iloc[-1]*eta_nozzle)
 
 for index, row in data.iterrows():
     if index != 0:
-        row['d'] = (4 * m_dot / (math.pi * row['u'] * row['rho']))**0.5
+        row['r'] = (m_dot / (math.pi * row['u'] * row['rho']))**0.5
 
 print(data)
