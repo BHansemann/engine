@@ -2,6 +2,7 @@
 import CoolProp.CoolProp as CP
 import numpy as np
 import pandas as pd
+import math
 
 # inputs
 p_ch = 100000       # chamber pressure in Pa
@@ -9,6 +10,7 @@ p_e = 10000         # exit pressure in Pa
 n_ps = 100          # number of pressure steps
 T_ch = 2500         # chamber temperature in Kelvin
 F_thrust = 500      # Thrust in N
+eta_nozzle = 0.983  # Efficiency of Nozzle
 x_n2 = 0.34269      # Mole fraction of exhaust products, via NASA CEA
 x_co = 0.23055
 x_h2 = 0.21104
@@ -61,4 +63,10 @@ for index, row in data.iterrows():
     row['c'] = (row['kappa'] * R_mix * row['T'])**0.5
     row['M'] = row['u'] / row['c']
 
-print(data.to_string())
+m_dot = F_thrust / (data['u'].iloc[-1]*eta_nozzle)
+
+for index, row in data.iterrows():
+    if index != 0:
+        row['d'] = (4 * m_dot / (math.pi * row['u'] * row['rho']))**0.5
+
+print(data)
