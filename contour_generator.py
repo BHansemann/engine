@@ -27,10 +27,10 @@ def conical_nozzle(r_t, r_ch, eta, alpha_div=15, alpha_con=35, rf_t=1, n_steps=1
             row['y'] = r_ch - row['x'] * math.tan(alpha_con)
         if l_1 < row['x'] <= l_1 + l_2:
             row['section'] = 1
-            row['y'] = r_t * (1 + (1 - math.cos(math.asin((l_2 - row['x'] + l_1) / (r_t * rf_t)))))
+            row['y'] = r_t * (1 + rf_t * (1 - math.cos(math.asin((l_2 - row['x'] + l_1) / (r_t * rf_t)))))
         if l_1 + l_2 < row['x'] <= l_1 + l_2 + l_3:
             row['section'] = 2
-            row['y'] = r_t * (1 + (1 - math.cos(math.asin((row['x'] - l_1 - l_2) / (r_t * rf_t)))))
+            row['y'] = r_t * (1 + rf_t * (1 - math.cos(math.asin((row['x'] - l_1 - l_2) / (r_t * rf_t)))))
         if l_1 + l_2 + l_3 < row['x']:
             row['section'] = 3
             row['y'] = r_t * (1 + rf_t * (1 - math.cos(alpha_div))) + (row['x'] - (l_1 + l_2 + l_3)) * math.tan(alpha_div)
