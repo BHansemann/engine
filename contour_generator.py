@@ -24,7 +24,7 @@ def conical_nozzle(r_t, r_ch, eta, alpha_div=15, alpha_con=35, rf_t=1, n_steps=1
         row['x']
         if row['x'] <= l_1:
             row['section'] = 0
-            row['y'] = r_ch - row['x'] * math.sin(alpha_con)
+            row['y'] = r_ch - row['x'] * math.tan(alpha_con)
         if l_1 < row['x'] <= l_1 + l_2:
             row['section'] = 1
             row['y'] = r_t * (1 + (1 - math.cos(math.asin((l_2 - row['x'] + l_1) / (r_t * rf_t)))))
@@ -33,7 +33,7 @@ def conical_nozzle(r_t, r_ch, eta, alpha_div=15, alpha_con=35, rf_t=1, n_steps=1
             row['y'] = r_t * (1 + (1 - math.cos(math.asin((row['x'] - l_1 - l_2) / (r_t * rf_t)))))
         if l_1 + l_2 + l_3 < row['x']:
             row['section'] = 3
-            row['y'] = r_t * (1 + rf_t * (1 - math.cos(alpha_div))) + (row['x'] - (l_1 + l_2 + l_3)) * math.sin(alpha_div)
+            row['y'] = r_t * (1 + rf_t * (1 - math.cos(alpha_div))) + (row['x'] - (l_1 + l_2 + l_3)) * math.tan(alpha_div)
 
     return nozzle
 
@@ -46,4 +46,7 @@ if __name__ == '__main__':
     ax.plot(example['x'], example['y'])
     ax.set(ylim=(0, 0.03))
     ax.set_aspect('equal')
+    ax2 = ax.twinx()
+    ax2.plot(example['x'], example['section'], 'r:', lw=0.5)
+    ax.grid(True)
     plt.show()
