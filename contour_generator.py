@@ -47,7 +47,7 @@ def bell_nozzle(r_t, r_ch, eta, alpha_div=15, alpha_con=35, alpha_end=12, rf_c=1
     l_1 = (r_ch - r_t * (1 + rf_c * (1 - math.cos(alpha_con)))) / math.tan(alpha_con)
     l_2 = r_t * rf_c * math.sin(alpha_con)
     l_3 = r_t * rf_d * math.sin(alpha_div)
-    l_4 = 0.5  # TODO
+    l_4 = 0.05  # TODO
     l_sum = l_1 + l_2 + l_3 + l_4
     for index, row in nozzle.iterrows():
         row['x'] = row.name * (l_sum / n_steps)
@@ -62,6 +62,7 @@ def bell_nozzle(r_t, r_ch, eta, alpha_div=15, alpha_con=35, alpha_end=12, rf_c=1
             row['section'] = 2
             row['y'] = r_t * (1 + rf_d * (1 - math.cos(math.asin((row['x'] - l_1 - l_2) / (r_t * rf_d)))))
         if l_1 + l_2 + l_3 < row['x']:
+            row['section'] = 3
             # TODO
     return nozzle
 
