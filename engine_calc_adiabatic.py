@@ -2,12 +2,13 @@
 import CoolProp.CoolProp as CP
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import math
 
 # inputs
-p_ch = 100000       # chamber pressure in Pa
-p_e = 10000         # exit pressure in Pa
-n_ps = 100          # number of pressure steps
+p_ch = 1000000       # chamber pressure in Pa
+p_e = 100000         # exit pressure in Pa
+n_ps = 1000          # number of pressure steps
 T_ch = 2500         # chamber temperature in Kelvin
 F_thrust = 500      # Thrust in N
 eta_nozzle = 0.983  # Efficiency of Nozzle
@@ -70,3 +71,5 @@ for index, row in data.iterrows():
         row['r'] = (m_dot / (math.pi * row['u'] * row['rho']))**0.5
 
 print(data)
+data.plot(subplots = True)
+plt.show()

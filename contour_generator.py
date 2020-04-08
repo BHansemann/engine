@@ -10,7 +10,7 @@ import math
 def conical_nozzle(r_t, r_ch, eta, alpha_div=15, alpha_con=35, rf_c=1, rf_d=1, n_steps=1000):
     alpha_div = math.radians(alpha_div)
     alpha_con = math.radians(alpha_con)
-    r_e = (eta * r_t**2)**0.5
+    r_e = eta**0.5 * r_t
     nozzle = pd.DataFrame(np.zeros((n_steps, 3)), columns={'x', 'y', 'section'})
     nozzle.loc[0, 'y'] = r_ch
     l_1 = (r_ch - r_t * (1 + rf_c * (1 - math.cos(alpha_con)))) / math.tan(alpha_con)
@@ -41,7 +41,7 @@ def bell_nozzle(r_t, r_ch, eta, alpha_div=15, alpha_con=35, alpha_end=12, rf_c=1
     alpha_div = math.radians(alpha_div)
     alpha_con = math.radians(alpha_con)
     alpha_end = math.radians(alpha_end)
-    r_e = (eta * r_t ** 2) ** 0.5
+    r_e = eta ** 0.5 * r_t
     nozzle = pd.DataFrame(np.zeros((n_steps, 3)), columns={'x', 'y', 'section'})
     nozzle.loc[0, 'y'] = r_ch
     l_1 = (r_ch - r_t * (1 + rf_c * (1 - math.cos(alpha_con)))) / math.tan(alpha_con)
