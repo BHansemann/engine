@@ -71,5 +71,5 @@ for index, row in data.iterrows():
         row['r'] = (m_dot / (math.pi * row['u'] * row['rho']))**0.5
 
 print(data)
-data.plot(subplots = True)
+data.plot(subplots=True)
 plt.show()
